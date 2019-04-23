@@ -508,7 +508,7 @@ bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text,
   long sttime = millis();
 
   if (text != "") {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() < sttime + SEND_DELAY) { // loop for a while to send the message
       String command = "bot" + _token + "/sendMessage?chat_id=" + chat_id +
                        "&text=" + text + "&parse_mode=" + parse_mode;
       String response = sendGetToTelegram(command);
@@ -616,7 +616,7 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject &payload) {
   long sttime = millis();
 
   if (payload.containsKey("text")) {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() < sttime + SEND_DELAY) { // loop for a while to send the message
       String command = "bot" + _token + "/sendMessage";
       String response = sendPostToTelegram(command, payload);
       if (_debug)
@@ -641,7 +641,7 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject &payload) {
   long sttime = millis();
 
   if (payload.containsKey("photo")) {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() < sttime + SEND_DELAY) { // loop for a while to send the message
       String command = "bot" + _token + "/sendPhoto";
       response = sendPostToTelegram(command, payload);
       if (_debug)
@@ -730,7 +730,7 @@ bool UniversalTelegramBot::sendChatAction(String chat_id, String text) {
   long sttime = millis();
 
   if (text != "") {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() < sttime + SEND_DELAY) { // loop for a while to send the message
       String command = "bot" + _token + "/sendChatAction?chat_id=" + chat_id +
                        "&action=" + text;
       String response = sendGetToTelegram(command);

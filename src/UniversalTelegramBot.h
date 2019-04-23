@@ -29,6 +29,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define HOST "api.telegram.org"
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
+#define SEND_DELAY 1000
+#define RCV_DELAY 1000
 
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
@@ -88,7 +90,13 @@ public:
   String userName;
   int longPoll = 0;
   bool _debug = false;
-  int waitForResponse = 1500;
+  //int waitForResponse = 1500;
+  int waitForResponse = RCV_DELAY;
+
+  // JMC 
+  // to check if we are connected to server
+  inline bool IsConnected() { return client->connected(); }
+  inline bool Connect() { return client->connect(HOST, SSL_PORT); }
 
 private:
   // JsonObject * parseUpdates(String response);
