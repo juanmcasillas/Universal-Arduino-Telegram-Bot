@@ -316,12 +316,12 @@ bool UniversalTelegramBot::getMe() {
   String command = "bot" + _token + "/getMe";
   String response =
       sendGetToTelegram(command); // receive reply from telegram.org
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject &root = jsonBuffer.parseObject(response);
-
+  DynamicJsonDocument json;
+  //JsonObject &root = jsonBuffer.parseObject(response);
+  auto error = deserializeJson(json, response);
   closeClient();
 
-  if (root.success()) {
+  if (error==0) {
     if (root.containsKey("result")) {
       String _name = root["result"]["first_name"];
       String _username = root["result"]["username"];
@@ -366,10 +366,10 @@ int UniversalTelegramBot::getUpdates(long offset) {
     }
 
     // Parse response into Json object
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(response);
-
-    if (root.success()) {
+    DynamicJsonDocument root;
+    //JsonObject &root = jsonBuffer.parseObject(response);
+    auto error = deserializeJson(json, buf.get());
+    if (error==0) {
       // root.printTo(Serial);
       if (_debug)
         Serial.println();
@@ -527,8 +527,8 @@ bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text,
 bool UniversalTelegramBot::sendMessage(String chat_id, String text,
                                        String parse_mode) {
 
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject &payload = jsonBuffer.createObject();
+  DynamicJsonDocument payload;
+  //JsonObject &payload = jsonBuffer.createObject();
 
   payload["chat_id"] = chat_id;
   payload["text"] = text;
@@ -544,8 +544,8 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
     String chat_id, String text, String parse_mode, String keyboard,
     bool resize, bool oneTime, bool selective) {
 
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject &payload = jsonBuffer.createObject();
+  DynamicJsonDocument payload;
+  //JsonObject &payload = jsonBuffer.createObject();
 
   payload["chat_id"] = chat_id;
   payload["text"] = text;
@@ -561,7 +561,7 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
   // Inner arrays represents columns
   // This example "ledon" and "ledoff" are two buttons on the top row
   // and "status is a single button on the next row"
-  DynamicJsonBuffer keyboardBuffer;
+  DynamicJsonDocument keyboardBuffer;
   replyMarkup["keyboard"] = keyboardBuffer.parseArray(keyboard);
 
   // Telegram defaults these values to false, so to decrease the size of the
@@ -586,8 +586,8 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(String chat_id,
                                                          String parse_mode,
                                                          String keyboard) {
 
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject &payload = jsonBuffer.createObject();
+  DynamicJsonDocument payload;
+  //JsonObject &payload = jsonBuffer.createObject();
 
   payload["chat_id"] = chat_id;
   payload["text"] = text;
@@ -595,10 +595,11 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(String chat_id,
   if (parse_mode != "") {
     payload["parse_mode"] = parse_mode;
   }
+  JsonObject doc = payload.to<JsonObject>();
 
-  JsonObject &replyMarkup = payload.createNestedObject("reply_markup");
+  JsonObject &replyMarkup = doc.createNestedObject("reply_markup");
 
-  DynamicJsonBuffer keyboardBuffer;
+  DynamicJsonDocument keyboardBuffer;
   replyMarkup["inline_keyboard"] = keyboardBuffer.parseArray(keyboard);
 
   return sendPostMessage(payload);
@@ -681,8 +682,8 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
                                        int reply_to_message_id,
                                        String keyboard) {
 
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject &payload = jsonBuffer.createObject();
+  DynamicJsonDocument payload;
+  //JsonObject &payload = jsonBuffer.createObject();
 
   payload["chat_id"] = chat_id;
   payload["photo"] = photo;
@@ -700,9 +701,10 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
   }
 
   if (keyboard) {
-    JsonObject &replyMarkup = payload.createNestedObject("reply_markup");
+    JsonObject doc = payload.to<JsonObject>();
+    JsonObject &replyMarkup = doc.createNestedObject("reply_markup");
 
-    DynamicJsonBuffer keyboardBuffer;
+    DynamicJsonDocument keyboardBuffer;
     replyMarkup["keyboard"] = keyboardBuffer.parseArray(keyboard);
   }
 
